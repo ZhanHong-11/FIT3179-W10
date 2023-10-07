@@ -1,0 +1,145 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 800,
+  "height": 600,
+  "title": "XXX",
+  "data": {
+    "url": "https://raw.githubusercontent.com/ZhanHong-11/FIT3179-W10/main/data/CO2_emission_%26_Renewable_Energy_Share_dataset.csv"
+  },
+  "params": [
+    {
+      "name": "Year_selection",
+      "value": 2019,
+      "bind": {
+        "input": "range",
+        "min": 2000,
+        "max": 2019,
+        "step": 1,
+        "name": "Year: "
+      }
+    },
+    {
+      "name": "Continent_selection",
+      "bind": {
+        "input": "select",
+        "options": [
+          null,
+          "North America",
+          "South America",
+          "Europe",
+          "Africa",
+          "Asia",
+          "Oceania"
+        ],
+        "labels": [
+          "Show All",
+          "North America",
+          "South America",
+          "Europe",
+          "Africa",
+          "Asia",
+          "Oceania"
+        ],
+        "name": "Continent Selection: "
+      }
+    }
+  ],
+  "transform": [
+    {"filter": "datum['Renewable energy share in the total final energy consumption (%)'] != null"},
+    {"filter": "datum.gdp_per_capita != null"},
+    {"filter": "datum.gdp_per_capita > 0"},
+    {"filter": "datum.Value_co2_emissions_kt_by_country != null"},
+    {"filter": "datum.Year == Year_selection"},
+    {
+      "filter": "Continent_selection == null || datum.Region == Continent_selection"
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "gdp_per_capita",
+      "type": "quantitative",
+      "title": "GDP per capita",
+      "axis": {"tickCount": 6},
+      "scale": {"type": "log", "domain": [1, 1000000]}
+    },
+    "y": {
+      "field": "Renewable energy share in the total final energy consumption (%)",
+      "type": "quantitative",
+      "axis": {"tickCount": 5},
+      "scale": {"type": "linear", "domain": [0, 100]}
+    }
+  },
+  "layer": [
+    {
+      "mark": "circle",
+      "encoding": {
+        "size": {
+          "field": "Value_co2_emissions_kt_by_country",
+          "type": "quantitative",
+          "scale": {
+            "type": "threshold",
+            "domain": [1000, 10000, 100000, 1000000, 10000000],
+            "range": [10, 50, 150, 200, 300, 400]
+          },
+          "legend": {"format": ".1s"}
+        },
+        "color": {
+          "field": "Region",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "North America",
+              "South America",
+              "Europe",
+              "Africa",
+              "Asia",
+              "Oceania"
+            ],
+            "range": [
+              "#e41a1c",
+              "#984ea3",
+              "#ff7f00",
+              "#a6cee3",
+              "#377eb8",
+              "#a65628"
+            ]
+          }
+        },
+        "opacity": {"value": 0.6},
+        "tooltip": [
+          {"field": "Entity", "type": "nominal", "title": "Country"},
+          {"field": "gdp_per_capita", "type": "quantitative", "title": "GDP per capita", "format": ","},
+          {"field": "Renewable energy share in the total final energy consumption (%)", "type": "quantitative", "format": ".2f"},
+          {"field": "Value_co2_emissions_kt_by_country", "type": "quantitative", "title": "CO2 emissions per capita (metric tons)", "format": ","}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "baseline": "middle",
+        "dx": -10,
+        "fontSize": 11.5,
+        "fontStyle": "italic"
+      },
+      "encoding": {
+        "text": {"field": "Entity", "type": "nominal"},
+        "color": {"value": "black"},
+        "opacity": {
+          "condition": {
+            "test": "datum['Entity'] == 'China' || datum['Entity'] == 'Malaysia' || datum['Entity'] == 'Australia' || datum['Entity'] == 'New Zealand' ||  datum['Entity'] == 'United States of America'",
+            "value": 1
+          },
+          "value": 0
+        },
+        "tooltip": [
+          {"field": "Entity", "type": "nominal", "title": "Country"},
+          {"field": "gdp_per_capita", "type": "quantitative", "title": "GDP per capita", "format": ","},
+          {"field": "Renewable energy share in the total final energy consumption (%)", "type": "quantitative", "format": ".2f"},
+          {"field": "Value_co2_emissions_kt_by_country", "type": "quantitative", "title": "CO2 emissions per capita (metric tons)", "format": ","}
+        ]
+      }
+    }
+  ]
+}
